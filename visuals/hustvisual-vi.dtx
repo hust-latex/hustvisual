@@ -39,7 +39,7 @@
 %   hustoceanblue, hustazureblue, husttechgray, hustantiquegold,
 %   hustyouthgreen, hustenergyred, hustvitalityorange, hustsunshineyellow,
 % }
-%  海洋蓝，天空蓝，科创灰，古韵金，青春绿，能量红，活力橙，阳光黄。
+% 海洋蓝，天空蓝，科创灰，古韵金，青春绿，能量红，活力橙，阳光黄。
 %    \begin{macrocode}
 \@@_set_color:nnn { hustoceanblue } { CMYK } { 100, 60, 0, 0 }
 \@@_set_color:nnn { hustazureblue } { CMYK } { 80, 0, 0, 0 }
@@ -50,6 +50,15 @@
 \@@_set_color:nnn { hustenergyred } { CMYK } { 0, 85, 85, 0 }
 \@@_set_color:nnn { hustvitalityorange } { CMYK } { 0, 0, 60, 100 }
 \@@_set_color:nnn { hustsunshineyellow } { CMYK } { 0, 20, 100, 0 }
+%    \end{macrocode}
+% \end{macro}
+%
+% \paragraph{特殊场景色}
+%
+% \begin{macro}[module=hustvi/colors/]{hustbachelorgreen}
+% 用于本科生毕业论文（设计）封面校名的绿色。
+%    \begin{macrocode}
+\@@_set_color:nnn { hustbachelorgreen } { CMYK } { 52, 0, 43, 70 }
 %    \end{macrocode}
 % \end{macro}
 %
@@ -88,6 +97,7 @@
       red = { hustred },
       black = { black },
       white = { white },
+      bachelorgreen = { hustbachelorgreen },
     },
   }
 %    \end{macrocode}
