@@ -6,8 +6,55 @@
 % \def\visualname{\pkg{hustvisual-vi}.dtx： 校级视觉标识}
 % \begin{documentation}
 % \subsection{\visualname{}}
-% \subsubsection{颜色}
+% 本小节介绍根据学校视觉标识使用规范（\url{https://vi.hust.edu.cn}）实现的校级视觉标识。
+% \subsubsection{色彩}
+%
+% \begin{function}[module=hustvi/colors/]{
+%   hustblue, hustred, hustspacegray,
+% }
+%   华科红，华科蓝，深空灰。
+% \end{function}
+%
+% \begin{function}[module=hustvi/colors/]{
+%   hustoceanblue, hustazureblue, husttechgray, hustantiquegold,
+%   hustyouthgreen, hustenergyred, hustvitalityorange, hustsunshineyellow,
+% }
+%   海洋蓝，天空蓝，科创灰，古韵金，青春绿，能量红，活力橙，阳光黄。
+% \end{function}
+%
 % \subsubsection{图案}
+%
+% \begin{function}[module=hustvi/vi/]{emblem}
+%   \begin{syntax}
+%     \tn{hustvi}\oarg{通用选项}\{\opt{emblem}\}
+%   \end{syntax}
+%   \marginnote{\hustvi[height=2em]{emblem}}
+%   校徽。
+%   可选的色彩预设模板有：
+%   \begin{arguments}
+%   \item[\opt{default}] 标准彩色（华科红，华科蓝，深空灰）
+%   \item[\opt{red}] 朱稿（华科红，华科红，华科红）
+%   \item[\opt{black}] 墨稿（黑色，黑色，黑色）
+%   \item[\opt{white}] 反白稿（白色，白色，白色）
+%   \end{arguments}
+% \end{function}
+%
+% \begin{function}[module=hustvi/vi/]{name}
+%   \begin{syntax}
+%     \tn{hustvi}\oarg{通用选项}\{\opt{name}\}
+%   \end{syntax}
+%   \marginnote{\hustvi[height=1em]{name}}
+%   校名。
+%   可选的色彩预设模板有：
+%   \begin{arguments}
+%   \item[\opt{blue}] 华科蓝
+%   \item[\opt{red}] 华科红
+%   \item[\opt{black}] 黑色
+%   \item[\opt{white}] 白色
+%   \item[\opt{bachelorgreen}] 本科生毕业论文（设计）封面校名绿色
+%   \end{arguments}
+% \end{function}
+%
 % \end{documentation}
 %
 % \begin{implementation}
@@ -18,7 +65,7 @@
 %<*package>
 %    \end{macrocode}
 %
-% \subsubsection{颜色}
+% \subsubsection{色彩}
 %
 % \paragraph{学校标准色}
 % \begin{macro}[module=hustvi/colors/]{

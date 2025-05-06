@@ -16,6 +16,8 @@
 \usepackage{hustvisual}
 \usepackage{hustvisual-doc}
 \usepackage{mdframed}
+\usepackage{marginnote}
+\usepackage{siunitx}
 
 \providecommand{\name}{\jobname}
 \providecommand{\pkgname}{\pkg{\name}}
@@ -55,11 +57,78 @@
 % \tableofcontents
 %
 % \changes{v1.0}{2025-05-06}{Initial release.}
+%
 % \section{宏包介绍}
 %
-% \section{开发说明}
+% 本宏包提供了华中科技大学视觉标识（visual identity）定义的接口，
+% 预设了部分常用的视觉标识，
+% 使得用户可以便捷地在文档中使用。
 %
-% \section{使用说明}
+% \subsection{\pkgname{} 发行版本号\label{sec:version}}
+%
+% 更新版本往往会带来新功能和修复问题，
+% 但有时也会不可避免地带来不向后兼容的修改。
+% 为了清晰地传达版本之间的变化，
+% 本宏包发行的版本号使用类似但不完全同于语义化版本控制（Semantic Versioning）规范
+% \footnote{\url{https://semver.org/}}用以标识。
+% 在本宏包中，对于版本号 |MAJOR.MINOR.PATCH|，递增相应的部分所表示的含义如下：
+% \begin{itemize}
+%   \item |MAJOR|：递增大版本号，
+%     表示已在正文文档化的公开接口上存在不向后兼容（backward compatibility）的修改，
+%     一般对文档代码不修改无法正常编译；
+%   \item |MINOR|：递增小版本号，
+%     表示已在正文文档化的非实验性公开接口上\emph{不}存在不向后兼容编译的修改，
+%     但在实验性公开接口上存在不向后兼容的修改。
+%     一般对文档代码不作修改或者只需小幅修改就可以正常编译；
+%   \item |PATCH|：递增补丁版本号，
+%     表示新版本含有向后兼容的 bug 修复，新功能，
+%     其中未文档化的私有接口可能会发生变化。
+% \end{itemize}
+% 以上内容所指的“公开接口”仅包括第 \ref{sec:usage} 节中介绍的供终端用户直接使用的接口。
+% 用户在更新宏包时，可以根据版本号的变化以及更新日志来判断是否需要修改自己的文档。
+%
+% \section{开发说明\label{sec:dev}}
+%
+% 本节介绍了宏包的开发和维护相关信息，
+% 包括如何添加新的色彩和图案。
+%
+% \begin{function}{\@@_set_color:nnn}
+%   \begin{syntax}
+%     \tn{@@_set_color:nnn}\marg{color-name}\marg{color-model}\marg{color-value}
+%   \end{syntax}
+% \end{function}
+%
+% \begin{function}{\@@_set_vi:n}
+%   \begin{syntax}
+%
+%   \end{syntax}
+% \end{function}
+%
+% \section{使用说明\label{sec:usage}}
+%
+% \begin{function}{\hustvi}
+%   \begin{syntax}
+%     \tn{hustvi}\oarg{通用选项}\marg{视觉标识}
+%   \end{syntax}
+%   \tn{hustvi} 是本宏包提供给终端用户使用最重要的一个接口，
+%   一切的视觉标识都是通过这个通用接口来使用。
+%   例如：
+%   \marginnote{\hustvi[height=1cm,temp=red]{emblem}}
+%   \begin{verbatim}
+%     \hustvi[height=1cm,temp=red]{emblem}
+%   \end{verbatim}
+%   可以在文档中使用如左页边所示，以通用选项：高 \qty{1}{cm}、色彩预设为\opt{blue}的华中科技大学校徽。
+%   目前，所有的视觉标识都实现了如下的\oarg{通用选项}：
+%  \begin{arguments}
+%   \item[\opt{filename}] 视觉标识的文件名，默认缺省，通常情况下不需要设置，仅在需要覆盖原有文件时使用。
+%   \item[\opt{dept}] 视觉标识的所属学院，默认值为 \opt{vi}，即华中科技大学校级的视觉标识。学院的缩写使用官方网站域名四级子域名（域名 |.hust.edu.cn| 左边的部分）作为缩写。
+%   \item[\opt{width}] 视觉标识的宽度，默认值为 \opt{0pt}，即使用默认的宽度。如果仅设置了宽度而没有设置高度，则高度会自动按比例缩放；如果同时设置了宽度和高度，则宽高比会被强制为 \opt{width}:\opt{height}。
+%   \item[\opt{height}] 视觉标识的高度，默认值为 \opt{0pt}，效果同上。
+%   \item[\opt{temp}] 视觉标识的色彩预设模板，不同视觉标识的色彩预设模板不同，具体的色彩预设模板请参考对应视觉标识的文档。
+%   \item[\opt{colors}] 手动按照顺序覆写色彩预设模板，同时设置了 \opt{temp} 和 \opt{colors} 时，\opt{colors} 会覆盖 \opt{temp} 的设置。 \opt{colors} 的格式为有序列表 \opt{\{color1,color2,...\}}，其中 \opt{color1}、\opt{color2} 等为色彩名称，色彩名称需要由 \pkg{xcolor} 宏包定义的色彩名称，且列表中的色彩数量不能超过预设模板中的色彩数量。\marginnote{\hustvi[colors={hustblue,black},temp=red,height=1cm]{emblem}} 例如：|\hustvi[colors={hustblue,black},temp=red]{emblem}| 就是基于 \opt{red} 模板的校徽，对前两种颜色依序使用了华科蓝 \opt{hustblue} 和黑色 \opt{black} 两种色彩\footnote{本错误配色示例仅用于说明，实际使用时请遵循视觉标识的色彩规范。}。
+%   \item[\opt{opacity}] （实验性功能）视觉标识的透明度，默认值为 \opt{1}，即不透明。透明度的范围为 \opt{0} 到 \opt{1}，其中 \opt{0} 表示完全透明，\opt{1} 表示完全不透明。
+%   \end{arguments}
+% \end{function}
 %
 % \end{documentation}
 %
@@ -115,7 +184,7 @@
 %   \l_@@_color_arg_iv_tl,
 %   \l_@@_color_arg_v_tl,
 % }
-% 传入 Tikz 中的颜色参数，默认为黑色。
+% 传入 Tikz 中的色彩参数，默认为黑色。
 %    \begin{macrocode}
 \clist_map_inline:Nn \c_@@_args_clist
   {
@@ -126,7 +195,7 @@
 % \end{macro}
 %
 % \begin{macro}{\l_@@_color_args_clist}
-% 颜色参数列表。
+% 色彩参数列表。
 %    \begin{macrocode}
 \clist_new:N \l_@@_color_args_clist
 %    \end{macrocode}
@@ -345,15 +414,15 @@
 %
 % \subsection{子模块接口}
 %
-% \subsubsection{颜色定义}
+% \subsubsection{色彩定义}
 %
 % \begin{macro}{\@@_set_color:nnn}
-% 定义颜色的函数。同时定义了 \pkg{l3color} 和 \pkg{xcolor} 中的颜色。
-% 此外，新增了 \opt{CMYK} 颜色模型的支持，用于添加 0--100 范围的 \opt{cmyk} 颜色。
+% 定义色彩的函数。同时定义了 \pkg{l3color} 和 \pkg{xcolor} 中的色彩。
+% 此外，新增了 \opt{CMYK} 色彩模型的支持，用于添加 0--100 范围的 \opt{cmyk} 色彩。
 % \begin{arguments}
-%   \item 颜色名称
-%   \item 颜色模型，如 \opt{CMYK}(0--100)、\opt{cmyk}(0--1)、\opt{RGB}(0--255)、\opt{rgb}(0--1) 等
-%   \item 颜色值，用逗号分隔的数值
+%   \item 色彩名称
+%   \item 色彩模型，如 \opt{CMYK}(0--100)、\opt{cmyk}(0--1)、\opt{RGB}(0--255)、\opt{rgb}(0--1) 等
+%   \item 色彩值，用逗号分隔的数值
 % \end{arguments}
 %    \begin{macrocode}
 \seq_new:N \l_@@_color_models_seq
