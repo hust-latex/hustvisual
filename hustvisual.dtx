@@ -55,7 +55,7 @@
 % \tableofcontents
 %
 % \changes{v1.0}{2025-05-06}{Initial release.}
-% \hustvi[temp=red]{horizontal, zh, name}
+% \hustvi[temp=red]{name}
 % \section{宏包介绍}
 %
 % \section{开发说明}
@@ -619,8 +619,8 @@
       }
     \prop_get:NnNT \l_@@_vi_prop { source } \l_@@_source_name_tl
       {
-        \prop_get:NeN \g_@@_vi_prop
-          { \@@_vi_name:N \l_@@_source_name_tl }
+        \prop_get:NVN \g_@@_vi_prop
+          \l_@@_source_name_tl
           \l_@@_vi_prop
       }
   }
