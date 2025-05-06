@@ -1,0 +1,47 @@
+\input docstrip
+\keepsilent
+\askforoverwritefalse
+\preamble
+
+    Copyright (C) 2025 by HUANG Yuxi <hustvisual@hyxi.dev>
+
+    This work may be distributed and/or modified under the
+    conditions of the LaTeX Project Public License, either
+    version 1.3c of this license or (at your option) any later
+    version. This version of this license is in
+       https://www.latex-project.org/lppl/lppl-1-3c.txt
+    and the latest version of this license is in
+       https://www.latex-project.org/lppl.txt
+    and version 1.3c or later is part of all distributions of LaTeX
+    version 2008 or later.
+
+    This work has the LPPL maintenance status "maintained".
+
+    The Current Maintainer of this work is HUANG Yuxi.
+
+\endpreamble
+\postamble
+
+    This work consists of the files \jobname.dtx
+    and the derived files \jobname.sty and \jobname.ins.
+
+\endpostamble
+
+\generate
+  {
+	\usedir{source/latex/hustvisual}
+	\file{\jobname.ins}{\from{\jobname.dtx}{install}}
+  \file{\jobname-doc.sty}{\from{\jobname.dtx}{doc-sty}}
+	\usedir{tex/latex/hustvisual}
+	\file{\jobname.sty}{
+		\from{\jobname.dtx}{package}
+		\from{\jobname-vi.dtx}{package}
+	}
+	\nopreamble\nopostamble
+	\file{\jobname-vi-emblem.def}{\from{\jobname-vi.dtx}{emblem}}
+	\file{\jobname-vi-emblem-revised.def}{\from{\jobname-vi.dtx}{emblem-revised}}
+	\file{\jobname-vi-logo.def}{\from{\jobname-vi.dtx}{logo}}
+	\file{\jobname-vi-horizontal-name-zh.def}{\from{\jobname-vi.dtx}{horizontal-name-zh}}
+	\file{\jobname-vi-name-vertical.def}{\from{\jobname-vi.dtx}{name-vertical}}
+  }
+\endbatchfile

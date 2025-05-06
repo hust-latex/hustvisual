@@ -1,0 +1,810 @@
+% \iffalse meta-comment
+% !TEX program = XeLaTeX
+%
+% DO NOT REMOVE THE MARK MANUALLY (used in l3build) -> %^^A [L3BUILD_REPLACED_MARK]
+%
+%<package|doc-sty>\NeedsTeXFormat{LaTeX2e}
+%<package>\ProvidesExplPackage{hustvisual}
+%<doc-sty>\ProvidesExplPackage{hustvisual-doc}
+%<package|doc-sty>  {[LATEST]}{[DEV]} %^^A [L3BUILD_REPLACED_MARK]
+%<package>  {Visual Identity of Huazhong University of Science and Technology}
+%<doc-sty>  {Docmentation Style for hustvisual}
+%<*driver>
+\documentclass{ctexart}
+\usepackage{useclass}
+\useclass*[full]{l3doc}
+\usepackage{hustvisual}
+\usepackage{hustvisual-doc}
+\usepackage{mdframed}
+
+\providecommand{\name}{\jobname}
+\providecommand{\pkgname}{\pkg{\name}}
+\begin{document}
+  \DisableImplementation
+
+  \DocInput{\jobname.dtx}
+  \DocInput{\jobname-vi.dtx}
+
+  \EnableImplementation
+  \DisableDocumentation
+  \DocInputAgain
+  \PrintChanges
+  \PrintIndex
+\end{document}
+%</driver>
+% \fi
+%
+% \begin{documentation}
+% \title{\pkgname.sty: 华中科技大学视觉标识汇编}
+% \author
+%   {
+%     黄宇希 Huang Yuxi^^A
+%     \thanks{
+%       \textit{Huang} is his surname.
+%     }
+%     <^^A
+%     \href
+%       {mailto:hustvisual@hyxi.dev}
+%       {hustvisual@hyxi.dev}^^A
+%     >
+%   }
+% \date{[LATEST] \quad Version [DEV]} ^^A [L3BUILD_REPLACED_MARK]
+%
+% \maketitle
+%
+% \tableofcontents
+%
+% \changes{v1.0}{2025-05-06}{Initial release.}
+% \hustvi[temp=red]{horizontal, zh, name}
+% \section{宏包介绍}
+%
+% \section{开发说明}
+%
+% \section{使用说明}
+%
+% \end{documentation}
+%
+% \begin{implementation}
+%
+%
+% \section{\pkgname{} 实现细节}
+%    \begin{macrocode}
+%<@@=hustvisual>
+%<*package>
+%    \end{macrocode}
+%
+% \subsection{常量声明}
+%
+% \begin{macro}{\c_@@_univ_tl}
+%    \begin{macrocode}
+\tl_const:Nn \c_@@_univ_tl { vi }
+%    \end{macrocode}
+% \end{macro}
+%
+%
+% \begin{macro}{\c_@@_depts_clist}
+% 定义了各个学院的缩写，使用官方网站域名四级子域名（域名 |.hust.edu.cn| 左边的部分）作为缩写。
+% 如遇类似同济医学院下设药学院（|pharm.tjmu.edu.cn|）或第一临床学院（|whuh.com|）的以非华科域名结尾的学院，另行商议。
+%    \begin{macrocode}
+\clist_const:Ne \c_@@_depts_clist
+  {
+    \c_@@_univ_tl,
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\c_@@_nargs_int, \c_@@_args_clist}
+% 参数索引。如有需要在这里修改参数索引数量。
+%    \begin{macrocode}
+\int_const:Nn \c_@@_nargs_int { 5 }
+\clist_new:N \c_@@_args_clist
+\int_step_inline:nn { \c_@@_nargs_int }
+  {
+    \exp_args:NNe \clist_put_right:Nn \c_@@_args_clist
+      {
+        \int_to_roman:n { #1 }
+      }
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \subsection{变量声明}
+% \begin{macro}{
+%   \l_@@_color_arg_i_tl,
+%   \l_@@_color_arg_ii_tl,
+%   \l_@@_color_arg_iii_tl,
+%   \l_@@_color_arg_iv_tl,
+%   \l_@@_color_arg_v_tl,
+% }
+% 传入 Tikz 中的颜色参数，默认为黑色。
+%    \begin{macrocode}
+\clist_map_inline:Nn \c_@@_args_clist
+  {
+    \tl_new:c { l_@@_color_arg_ #1 _tl }
+    \tl_set:cn { l_@@_color_arg_ #1 _tl } { black }
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\l_@@_color_args_clist}
+% 颜色参数列表。
+%    \begin{macrocode}
+\clist_new:N \l_@@_color_args_clist
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{
+%   \l_@@_dept_tl,
+%   \l_@@_vi_clist,
+%   \l_@@_ncolors_int,
+%   \l_@@_temps_prop,
+%   \l_@@_temp_tl,
+%   \l_@@_filename_tl,
+%   \l_@@_aliases_clist,
+%   \l_@@_colors_clist,
+%   \l_@@_temp_colors_clist,
+%   \l_@@_vi_tl,
+%   \l_@@_width_dim,
+%   \l_@@_height_dim,
+%   \l_@@_opacity_fp,
+% }
+% 视觉标识临时变量。
+%    \begin{macrocode}
+\tl_new:N \l_@@_dept_tl
+\clist_new:N \l_@@_vi_clist
+\int_new:N \l_@@_ncolors_int
+\prop_new:N \l_@@_temps_prop
+\tl_new:N \l_@@_temp_tl
+\tl_new:N \l_@@_filename_tl
+\clist_new:N \l_@@_aliases_clist
+\clist_new:N \l_@@_colors_clist
+\clist_new:N \l_@@_temp_colors_clist
+\tl_new:N \l_@@_vi_tl
+\dim_new:N \l_@@_width_dim
+\dim_new:N \l_@@_height_dim
+\fp_new:N \l_@@_opacity_fp
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\g_@@_vi_prop}
+% 视觉标识属性列表。
+%    \begin{macrocode}
+\prop_new:N \g_@@_vi_prop
+%    \end{macrocode}
+% \end{macro}
+%
+%
+% \subsection{辅助函数}
+%
+% \begin{macro}{
+%   \@@_msg_new:nn,
+%   \@@_warning:n,
+%   \@@_warning:ne,
+%   \@@_warning:nee,
+%   \@@_warning:neee,
+%   \@@_error:n,
+%   \@@_error:ne,
+%   \@@_error:nee,
+%   \@@_error:neee,
+%}
+% 各种信息函数的缩略形式。
+%    \begin{macrocode}
+\cs_new:Npn \@@_msg_new:nn { \msg_new:nnn { hustvisual } }
+\cs_new:Npn \@@_warning:n { \msg_warning:nn { hustvisual } }
+\cs_new:Npn \@@_warning:ne { \msg_warning:nne { hustvisual } }
+\cs_new:Npn \@@_warning:nee { \msg_warning:nnee { hustvisual } }
+\cs_new:Npn \@@_warning:neee { \msg_warning:nneee { hustvisual } }
+\cs_new:Npn \@@_error:n { \msg_error:nn { hustvisual } }
+\cs_new:Npn \@@_error:ne { \msg_error:nne { hustvisual } }
+\cs_new:Npn \@@_error:nee { \msg_error:nnee { hustvisual } }
+\cs_new:Npn \@@_error:neee { \msg_error:nneee { hustvisual } }
+%    \end{macrocode}
+% \end{macro}
+%
+% \subsection{宏包载入}
+%
+%    \begin{macrocode}
+\RequirePackage{tikz}
+\RequirePackage{xcolor}
+%    \end{macrocode}
+%
+% \subsection{内部函数}
+%
+% \begin{macro}{\@@_deploy_colors:}
+% 将 \cs{l_@@_color_args_clist} 展开到对应的变量方便在视觉标识文件（|hustvisual-*.def|）中调用。
+%    \begin{macrocode}
+\@@_msg_new:nn { color-args-exceed }
+{
+  The~ `colors'~ arguments(#1)~ exceed~ the~ number~ of~ defined~ colors(#2).
+  Please~ check~ the~ number~ of~ colors~ in~ the~ documentation~ of~ the~ package.
+}
+\int_new:N \l_@@_color_nargs_int
+\cs_new:Npn \@@_deploy_colors:
+  {
+    \int_set:Nn \l_@@_color_nargs_int
+      { \clist_count:N \l_@@_color_args_clist }
+    \int_compare:nNnTF
+      { \l_@@_color_nargs_int } > { \c_@@_nargs_int }
+      {
+        \@@_warning:nee { color-args-exceed }
+          { \int_use:N \l_@@_color_nargs_int }
+          { \int_use:N \c_@@_nargs_int }
+        \@@_deploy_colors:N \c_@@_nargs_int
+      }
+      {
+        \@@_deploy_colors:N \l_@@_color_nargs_int
+      }
+  }
+\tl_new:N \l_@@_color_arg_tl
+\cs_new:Npn \@@_deploy_colors:N #1
+  {
+    \int_step_inline:nn { #1 }
+      {
+        \tl_set:Nx \l_@@_color_arg_tl
+          {
+            l_@@_color_arg_
+            \clist_item:Nn \c_@@_args_clist { ##1 }
+            _tl
+          }
+        \tl_set:cx
+          {
+            \l_@@_color_arg_tl
+          }
+          {
+            \clist_item:Nn \l_@@_color_args_clist { ##1 }
+          }
+      }
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\@@_sort_vi_name:, \@@_sort_vi_name:N}
+% 对 \cs{l_@@_vi_clist} 进行排序。
+%    \begin{macrocode}
+\cs_new:Npn \@@_sort_vi_name:
+  {
+    \@@_sort_vi_name:N \l_@@_vi_clist
+  }
+\cs_new:Npn \@@_sort_vi_name:N #1
+  {
+    \clist_sort:Nn #1
+      {
+        \str_compare:nNnTF { ##1 } > { ##2 }
+        { \sort_return_swapped: }
+        { \sort_return_same: }
+      }
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\@@_vi_name:, \@@_vi_name:N, \@@_vi_name:NN}
+% 从 \cs{l_@@_dept_tl}，和 \cs{l_@@_vi_clist} 中生成唯一的视觉标识名称。
+%    \begin{macrocode}
+\tl_const:Nn \c_@@_dept_sep_tl { - }
+\tl_const:Nn \c_@@_vi_sep_tl { - }
+\cs_new:Npn \@@_vi_name:
+  {
+    \@@_vi_name:N \l_@@_vi_clist
+  }
+\cs_new:Npn \@@_vi_name:N #1
+  {
+    \@@_vi_name:NN \l_@@_dept_tl #1
+  }
+\cs_new:Npn \@@_vi_name:NN #1#2
+  {
+    \tl_use:N #1
+    \tl_use:N \c_@@_dept_sep_tl
+    \exp_args:NNV \clist_use:Nn #2 \c_@@_vi_sep_tl
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\@@_vi_filename:}
+% 生成视觉标识文件名。
+%    \begin{macrocode}
+\tl_const:Nn \c_@@_vi_filename_prefix_tl { hustvisual- }
+\tl_const:Nn \c_@@_vi_filename_suffix_tl { .def }
+\cs_new:Npn \@@_vi_filename:
+  {
+    \tl_use:N \c_@@_vi_filename_prefix_tl
+    \@@_vi_name:
+    \tl_use:N \c_@@_vi_filename_suffix_tl
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\@@_prop_default_value:N}
+%    \begin{macrocode}
+%\bool_new:N \l_@@_prop_set_bool
+\tl_new:N \l_@@_prop_set_tl
+\cs_new:Npn \@@_prop_default_value:N #1
+  {
+    \bool_set_false:N \l_@@_prop_set_bool
+%    \end{macrocode}
+% \cs{prop_map_break:} 因未知原因无法使用。
+%    \begin{macrocode}
+    \prop_map_inline:Nn #1
+      {
+        \bool_if:NF \l_@@_prop_set_bool
+          {
+            \bool_set_true:N \l_@@_prop_set_bool
+            \tl_set:Nn \l_@@_prop_set_tl { ##2 }
+          }
+      }
+    \tl_use:N \l_@@_prop_set_tl
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+%    \begin{macrocode}
+\keys_define:nn { hustvisual }
+  {
+    dev .meta:nn = { hustvisual / dev } { #1 },
+    user .meta:nn = { hustvisual / user } { #1 },
+  }
+%    \end{macrocode}
+%
+% \subsection{子模块接口}
+%
+% \subsubsection{颜色定义}
+%
+% \begin{macro}{\@@_set_color:nnn}
+% 定义颜色的函数。同时定义了 \pkg{l3color} 和 \pkg{xcolor} 中的颜色。
+% 此外，新增了 \opt{CMYK} 颜色模型的支持，用于添加 0--100 范围的 \opt{cmyk} 颜色。
+% \begin{arguments}
+%   \item 颜色名称
+%   \item 颜色模型，如 \opt{CMYK}(0--100)、\opt{cmyk}(0--1)、\opt{RGB}(0--255)、\opt{rgb}(0--1) 等
+%   \item 颜色值，用逗号分隔的数值
+% \end{arguments}
+%    \begin{macrocode}
+\seq_new:N \l_@@_color_models_seq
+\seq_new:N \l_@@_color_values_seq
+\int_new:N \l_@@_set_colors_int
+\tl_new:N \l_@@_color_model_tl
+\tl_new:N \l_@@_color_models_tl
+\tl_new:N \l_@@_color_values_tl
+\clist_new:N \l_@@_set_colors_clist
+\cs_new:Npn \@@_set_color:nnn #1#2#3
+  {
+    \seq_set_split:Nnn \l_@@_color_models_seq { / } { #2 }
+    \seq_set_split:Nnn \l_@@_color_values_seq { / } { #3 }
+    \int_compare:nNnF
+      { \seq_count:N \l_@@_color_models_seq }
+      =
+      { \seq_count:N \l_@@_color_values_seq }
+      {
+        \@@_error:nee { color-models-unpair }
+          { \seq_count:N \l_@@_color_models_seq }
+          { \seq_count:N \l_@@_color_values_seq }
+      }
+    \exp_args:NNe \int_set:Nn \l_@@_set_colors_int
+      { \seq_count:N \l_@@_color_models_seq }
+    \int_step_inline:nn { \l_@@_set_colors_int } % ##1
+      {
+        \tl_set:Ne \l_@@_color_model_tl
+          { \seq_item:Nn \l_@@_color_models_seq { ##1 } }
+        \exp_args:Nne \str_if_eq:nnT { CMYK }
+          { \seq_item:Nn \l_@@_color_models_seq { ##1 } }
+          {
+            \clist_clear:N \l_@@_set_colors_clist
+            \seq_set_item:Nnn \l_@@_color_models_seq { ##1 } { cmyk }
+            \exp_args:Ne \clist_map_inline:nn % ####1
+              { \seq_item:Nn \l_@@_color_values_seq { ##1 } }
+              {
+                \clist_put_right:Ne \l_@@_set_colors_clist
+                  { \fp_to_decimal:n { \fp_eval:n { ####1 / 100 } } }
+              }
+            \exp_args:NNnV \seq_set_item:Nnn
+              \l_@@_color_values_seq { ##1 } \l_@@_set_colors_clist
+          }
+      }
+    \tl_set:Ne \l_@@_color_models_tl
+      { \seq_use:Nn \l_@@_color_models_seq { / } }
+    \tl_set:Ne \l_@@_color_values_tl
+      { \seq_use:Nn \l_@@_color_values_seq { / } }
+    \exp_args:Nnee \color_set:nnn { #1 }
+      { \l_@@_color_models_tl }
+      { \l_@@_color_values_tl }
+    \definecolor { #1 }
+      { \l_@@_color_models_tl }
+      { \l_@@_color_values_tl }
+  }
+\@@_msg_new:nn { color-models-unpair }
+  {
+    The~ number(#1)~ of~ color~ models~ in~ the~ `colors'~
+    arguments~ is~ not~ equal~ to~ the~ number(#2)~ of~ color values.
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \subsubsection{图案定义}
+%
+% \begin{macro}{\@@_set_vi:n}
+%    \begin{macrocode}
+\cs_new:Npn \@@_set_vi:n #1
+  {
+    \group_begin:
+    \keys_set:nn { hustvisual / dev } { #1 }
+    \@@_process_set_vi:
+    \group_end:
+  }
+%\prop_new:N \l_@@_colors_clist
+\keys_define:nn { hustvisual / dev }
+  {
+    dept .choices:Vn = \c_@@_depts_clist
+      {
+        \tl_set_eq:NN \l_@@_dept_tl \l_keys_choice_tl
+      },
+    dept .initial:V = \c_@@_univ_tl,
+    vi .clist_set:N = \l_@@_vi_clist,
+    vi .value_required:n = true,
+    ncolors .int_set:N = \l_@@_ncolors_int,
+    ncolors .initial:V = \c_zero_int,
+    temps .meta:nn = { hustvisual / dev / temps } { #1 },
+    temps / unknown .code:n =
+      {
+        \clist_set:Nn \l_@@_colors_clist { #1 }
+        \prop_put:NVV \l_@@_temps_prop \l_keys_key_str \l_@@_colors_clist
+      },
+    filename .tl_set:N = \l_@@_filename_tl,
+    filename .initial:V = \c_empty_tl,
+    aliases .clist_set:N = \l_@@_aliases_clist,
+    aliases .initial:V = \c_empty_clist,
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\@@_process_set_vi:}
+% 处理视觉标识文件的函数。
+%    \begin{macrocode}
+\prop_new:N \l_@@_vi_prop
+\int_new:N \l_@@_ncolors_tmp_int
+\clist_new:N \l_@@_alias_name_clist
+\tl_new:N \l_@@_alias_name_tl
+\cs_new:Npn \@@_process_set_vi:
+  {
+    \prop_clear:N \l_@@_vi_prop
+    \int_compare:nNnT
+      { \l_@@_ncolors_int } > { \c_@@_nargs_int }
+      {
+        \@@_error:nee { colors-exceed-max }
+          { \int_use:N \l_@@_ncolors_int }
+          { \int_use:N \c_@@_nargs_int }
+      }
+    \prop_put:NnV \l_@@_vi_prop { ncolors } \l_@@_ncolors_int
+    \prop_map_inline:Nn \l_@@_temps_prop
+      {
+        \int_set:Nn \l_@@_ncolors_tmp_int
+          { \clist_count:n { ##2 } }
+        \int_compare:nNnF
+          { \l_@@_ncolors_int } = { \l_@@_ncolors_tmp_int }
+          {
+            \@@_error:neee { colors-not-match }
+              { ##1 }
+              { \int_use:N \l_@@_ncolors_tmp_int }
+              { \int_use:N \l_@@_ncolors_int }
+          }
+      }
+    \int_compare:nNnF
+      { \l_@@_ncolors_int } = { \c_zero_int }
+      {
+        \int_compare:nNnT
+          { \prop_count:N \l_@@_temps_prop } = { \c_zero_int }
+          {
+            \@@_error:n { no-temp }
+          }
+      }
+    \prop_put:NnV \l_@@_vi_prop { temps } \l_@@_temps_prop
+    \@@_sort_vi_name:
+    \tl_if_empty:NT \l_@@_filename_tl
+      {
+        \tl_set:Ne \l_@@_filename_tl
+          { \@@_vi_filename: }
+      }
+    \file_if_exist:VF \l_@@_filename_tl
+      {
+        \@@_warning:nee { filename-error }
+          { \tl_use:N \l_@@_filename_tl }
+          { \@@_vi_name: }
+      }
+    \prop_put:NnV \l_@@_vi_prop { filename } \l_@@_filename_tl
+    \prop_if_in:NeT \g_@@_vi_prop { \@@_vi_name: }
+      {
+        \@@_warning:ne { vi-skip }
+          { \@@_vi_name: }
+      }
+    \prop_gput_if_not_in:NeV \g_@@_vi_prop \@@_vi_name: \l_@@_vi_prop
+    \clist_map_variable:NNn \l_@@_aliases_clist \l_@@_alias_name_clist
+      {
+        \prop_clear:N \l_@@_vi_prop
+        \prop_put:Nne \l_@@_vi_prop { source } { \@@_vi_name: }
+        \tl_set:Ne \l_@@_alias_name_tl
+          { \@@_vi_name:N \l_@@_alias_name_clist }
+        \prop_if_in:NVT \g_@@_vi_prop \l_@@_alias_name_tl
+          {
+            \@@_warning:nee { vi-skip }
+              { \l_@@_alias_name_tl }
+          }
+        \prop_gput_if_not_in:NVV \g_@@_vi_prop
+          \l_@@_alias_name_tl
+          \l_@@_vi_prop
+      }
+  }
+\@@_msg_new:nn { colors-exceed-max }
+  {
+    The~ number(#1)~ of~ colors~ in~ the~ `ncolors'~ property~
+    exceeds~ the~ maximum~ number(#2)~ of~ colors.~
+    Please~ increase~ the~ number~ of~ colors~ in~ the~ \c_@@_nargs_int.
+  }
+\@@_msg_new:nn { no-temp }
+  {
+    The~ `temps'~ property~ should~ be~ set~ to~ a~ list~ of~ colors,~
+    when~ the~ `ncolors'~ property~ is~ not~ zero.
+  }
+\@@_msg_new:nn { colors-not-match }
+  {
+    The~ number(#2)~ of~ colors~ in~ the~ `temps'~ property(#1)~
+    does~ not~ match~ the~ number(#3)~ asserted~ in~ the~
+    `ncolors'~ property.
+  }
+\@@_msg_new:nn { filename-error }
+  {
+    The~ filename~(#1)~ of~ the~ vi(#2)~
+    is~ not~ found~ in~ the~ TeX~ search~ path.~
+    Please~ check~ the~ filename.
+  }
+\@@_msg_new:nn { vi-skip }
+  {
+    The~ vi~(#1)~ is~ already~ defined.~
+    The~ new~ definition~ has~ been~ skipped.
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+%
+% \subsection{用户接口}
+%
+% \begin{macro}{\hustvi}
+%    \begin{macrocode}
+\NewDocumentCommand \hustvi { O{} m }
+  {
+    \group_begin:
+    \keys_set:nn { hustvisual / user }
+      {
+        #1,
+        vi = { #2 },
+      }
+    \@@_process_vi_name:
+    \@@_process_temp:
+    \@@_process_colors:
+    \@@_process_file:
+    \@@_process_vi:
+    \group_end:
+  }
+\keys_define:nn { hustvisual / user }
+  {
+    dept .choices:Vn = \c_@@_depts_clist
+      {
+        \tl_set_eq:NN \l_@@_dept_tl \l_keys_choice_tl
+      },
+    vi .clist_set:N = \l_@@_vi_clist,
+    vi .value_required:n = true,
+    filename .tl_set:N = \l_@@_filename_tl,
+    filename .initial:V = \c_empty_tl,
+    width .dim_set:N = \l_@@_width_dim,
+    width .initial:V = \c_zero_dim,
+    height .dim_set:N = \l_@@_height_dim,
+    height .initial:V = \c_zero_dim,
+    temp .tl_set:N = \l_@@_temp_tl,
+    temp .initial:V = \c_empty_tl,
+    colors .clist_set:N = \l_@@_colors_clist,
+    colors .initial:V = \c_empty_clist,
+    opacity .fp_set:N = \l_@@_opacity_fp,
+    opacity .initial:V = \c_one_fp,
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\@@_process_vi_name:}
+%    \begin{macrocode}
+\tl_new:N \l_@@_source_name_tl
+\cs_new:Npn \@@_process_vi_name:
+  {
+    \@@_sort_vi_name:
+    \prop_get:NeNF \g_@@_vi_prop \@@_vi_name: \l_@@_vi_prop
+      {
+        \@@_error:nee { invalid-vi-name }
+          { \l_@@_dept_tl }
+          { \l_@@_vi_clist }
+      }
+    \prop_get:NnNT \l_@@_vi_prop { source } \l_@@_source_name_tl
+      {
+        \prop_get:NeN \g_@@_vi_prop
+          { \@@_vi_name:N \l_@@_source_name_tl }
+          \l_@@_vi_prop
+      }
+  }
+\@@_msg_new:nn { invalid-vi-name }
+  {
+    The~ combination~ of~ `dept'(#1)~ and~ `vi'(#2)~
+    is~ not~ valid.~
+    Please~ check~ the~ documentation~ of~ the~ package.
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\@@_process_temp:}
+%    \begin{macrocode}
+\bool_new:N \l_@@_prop_set_bool
+\cs_new:Npn \@@_process_temp:
+  {
+    \prop_get:NnN \l_@@_vi_prop { temps } \l_@@_temps_prop
+    \prop_get:NVNF \l_@@_temps_prop
+      \l_@@_temp_tl \l_@@_color_args_clist
+      {
+        \tl_if_empty:NF \l_@@_temp_tl
+          {
+            \@@_warning:ne { invalid-temp }
+              { \l_@@_temp_tl }
+          }
+        \bool_set_false:N \l_@@_prop_set_bool
+        \prop_map_inline:Nn \l_@@_temps_prop
+          {
+            \bool_if:NF \l_@@_prop_set_bool
+              {
+                \bool_set_true:N \l_@@_prop_set_bool
+                \clist_set:Nn \l_@@_color_args_clist { ##2 }
+              }
+          }
+      }
+    \@@_deploy_colors:
+  }
+\@@_msg_new:nn { invalid-temp }
+  {
+    The~ `temp'~ property~(#1)~ is~ not~ valid.~
+    The~ default~ template~ will~ be~ used.~
+    Please~ check~ the~ documentation~ of~ the~ package.
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\@@_process_colors:}
+%    \begin{macrocode}
+\tl_new:N \l_@@_color_tl
+\cs_new:Npn \@@_process_colors:
+  {
+    \clist_if_empty:NF \l_@@_colors_clist
+      {
+        \clist_set_eq:NN \l_@@_color_args_clist \l_@@_colors_clist
+        \@@_deploy_colors:
+      }
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\@@_process_file:}
+%    \begin{macrocode}
+\cs_new:Npn \@@_process_file:
+  {
+    \tl_if_empty:NT \l_@@_filename_tl
+      {
+        \prop_get:NnN \l_@@_vi_prop { filename } \l_@@_filename_tl
+      }
+    \file_get:VnNF \l_@@_filename_tl { \ExplSyntaxOn } \l_@@_vi_tl
+      {
+        \@@_error:ne { file-not-found }
+          { \tl_use:N \l_@@_filename_tl }
+      }
+    \tl_gput_left:Nn \l_@@_vi_tl
+      {
+        \begin{tikzpicture}[
+          inner~sep=0pt,
+          outer~sep=0pt,
+          opacity=\fp_use:N \l_@@_opacity_fp
+        ]
+      }
+    \tl_gput_right:Nn \l_@@_vi_tl
+      {
+        \end{tikzpicture}
+        \color_fill:n {red}
+      }
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\@@_process_vi:}
+%    \begin{macrocode}
+\box_new:N \l_@@_vi_box
+\cs_new:Npn \@@_process_vi:
+  {
+    \exp_args:NNV \hbox_set:Nn \l_@@_vi_box \l_@@_vi_tl
+    \dim_compare:nNnTF
+      { \l_@@_width_dim } > { \c_zero_dim }
+      {
+        \dim_compare:nNnTF
+        { \l_@@_height_dim } > { \c_zero_dim }
+        {
+          \exp_args:NNVV \box_resize_to_wd_and_ht:Nnn \l_@@_vi_box
+            \l_@@_width_dim \l_@@_height_dim
+        }
+        {
+          \exp_args:NNV \box_resize_to_wd:Nn \l_@@_vi_box \l_@@_width_dim
+        }
+      }
+      {
+        \dim_compare:nNnT
+        { \l_@@_height_dim } > { \c_zero_dim }
+        {
+          \exp_args:NNV \box_resize_to_ht:Nn \l_@@_vi_box \l_@@_height_dim
+        }
+      }
+    \box_use:N \l_@@_vi_box
+  }
+\@@_msg_new:nn { file-not-found }
+  {
+    The~ file~(#1)~ is~ not~ found.~
+    Please~ check~ the~ file~ name.
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+%    \begin{macrocode}
+%</package>
+%    \end{macrocode}
+% \subsection{文档样式}
+%    \begin{macrocode}
+%<*doc-sty>
+%    \end{macrocode}
+%
+% \begin{macro}[no-user-doc]{\key}
+% 用于在文档中输出自定义索引的命令，主要用于键值对的键的索引。仅当索引项的父分类为 |hustvi| 时，即用于文档类选项时，隐藏父分类。
+%  \begin{arguments}
+%    \item 在索引中显示项的父分类，默认为 \opt{hustvi}。
+%    \item 命令本体。
+%  \end{arguments}
+%    \begin{macrocode}
+\DeclareDocumentCommand \key { O{hustvi} m }
+  {
+    \tl_if_eq:nnTF { #1 } { hustvi }
+      { \cmd[module=#1/]{#2} }
+      { \cmd[module=#1/]{#1/#2} }
+  }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}[no-user-doc]{\opt}
+% 输出键值对的值。
+%    \begin{macrocode}
+\DeclareDocumentCommand \opt { s m }
+  { \IfBooleanTF {#1} { \texttt{\bfseries \upshape #2} } { \texttt{\upshape #2} } }
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{macro}{\g_@@_show_vi_bool}
+% 定义是否显示视觉标识实现的全局变量，默认为不显示。
+%    \begin{macrocode}
+\bool_new:N \g_@@_show_vi_bool
+\bool_gset_false:N \g_@@_show_vi_bool
+%    \end{macrocode}
+% \end{macro}
+%
+% \begin{environment}{viimplementation}
+% 定义实现视觉标识所需要的文档环境。
+%    \begin{macrocode}
+\NewDocumentEnvironment { viimplementation } { }
+  {
+    \bool_if:NF \g_@@_show_vi_bool { \comment }
+  }
+  {
+    \bool_if:NF \g_@@_show_vi_bool { \endcomment }
+  }
+%    \end{macrocode}
+% \end{environment}
+%
+%    \begin{macrocode}
+%</doc-sty>
+%    \end{macrocode}
+%
+% \section{子模块实现细节}
+%
+% \end{implementation}
