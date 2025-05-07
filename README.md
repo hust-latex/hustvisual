@@ -34,4 +34,3 @@ If you are a developer interested in contributing to the project or testing the 
 ## License
 This project was created by [Huang Yuxi](https://github.com/huangyxi).
 The source code of this project is licensed under the [LPPL v1.3c](https://www.latex-project.org/lppl/lppl-1-3c/).
-The visual identity assets (found in the `visuals/` directory) are © **Huazhong University of Science and Technology (HUST)** and must be used in accordance with the official guidelines available at [vi.hust.edu.cn](https://vi.hust.edu.cn/).
