@@ -30,6 +30,13 @@ $text =~ s/\s*\.\.\s*controls/\n${indent}.. controls/g;
 # Add newlines between points
 $text =~ s/\)\s*\(/\)\n${indent}\(/g;
 
+# Remove tikzpicture environment
+$text =~ s/\\begin\{tikzpicture\}\s*\[(.*?)\]\s*//g;
+$text =~ s/\\end\{tikzpicture\}\s*//g;
+
+# Remove \def \globalscale {1.000000}
+$text =~ s/\\def\s+\\globalscale\s+\{.*?\}\s*//g;
+
 # Remove leading/trailing whitespace
 $text =~ s/^\s+|\s+$//g;
 

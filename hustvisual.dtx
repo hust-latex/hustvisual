@@ -94,11 +94,13 @@
 % 本节内容的指令仅可在本宏包或者子模块中使用，
 % 在正文文档中使用会导致编译错误。
 %
+% \subsection{添加新的色彩}
+%
 % \begin{function}{\@@_set_color:nnn}
 %   \begin{syntax}
-%     \tn{@@_set_color:nnn} \marg{色彩名称} \marg{色彩模型} \marg{色彩值}
+%     \cs{@@_set_color:nnn} \marg{色彩名称} \marg{色彩模型} \marg{色彩值}
 %   \end{syntax}
-%   \tn{@@_set_color:nnn} 是一个用于同时定义 \pkg{l3color} 和 \pkg{xcolor} 中的色彩的函数。例如：
+%   \cs{@@_set_color:nnn} 是一个用于同时定义 \pkg{l3color} 和 \pkg{xcolor} 中的色彩的函数。例如：
 %   \begin{verbatim}
 %     \@@_set_color:nnn { hustblue } { CMYK } { 100, 74, 27, 0 }
 %   \end{verbatim}
@@ -110,11 +112,27 @@
 % \end{arguments}
 % \end{function}
 %
+% \subsection{添加新的图案}
+%
+% 推荐使用 Inkscape 打开图案矢量图形文件，
+% 并使用 svg2tikz （\url{https://github.com/xyz2tex/svg2tikz}）插件将其转换为 TikZ 代码。
+% 在导出时，选择 \TeX template 为 Tikzpicture，启用裁切 Crop，关闭自动换行 Wrap paths 和缩进选项 Indent group ，数字精度 Number of decimal 设置为 3；使用 cm 为单位，关闭 Inkscape origin 选项，缩放比例 Scale 设置为 1.0。
+%
+% 导出后请使用 |scripts/tikz-format.pl| 脚本进行格式化，
+% 脚本会对 \TikZ 代码进行格式化，包括缩进、换行、删除多余的空格等操作。
+%
+% 之后请手动将颜色按照一定顺序替换为如 \cs{l_@@_color_arg_i_tl} 形式的变量，
+% 以便于后续的色彩参数传递。
+% 在完全替换后，
+% 删除开头的 |\definecolor| 语句，
+% 将其 \TikZ 代码放入 guard （|%<*xxx>| 至 |%</xxx>|）中，
+% 并更新相应文档，实现和 |hustvisual.ins| 文件。
+%
 % \begin{function}{\@@_set_vi:n}
 %   \begin{syntax}
-%     \tn{@@_set_vi:n} \marg{图案参数}
+%     \cs{@@_set_vi:n} \marg{图案参数}
 %   \end{syntax}
-%   \tn{@@_set_vi:n} 是一个用于设置图案的函数。
+%   \cs{@@_set_vi:n} 是一个用于设置图案的函数。
 %   \marg{图案参数} 是一个由逗号分隔的键值对无序列表，
 %   其中每个键值对的格式为 \opt{key=value}。
 %   有些键值对是可选的，如果没有设置，则使用默认值；而有些是必选的，不设置则会导致编译错误。
@@ -133,9 +151,9 @@
 %
 % \begin{function}{\hustvi}
 %   \begin{syntax}
-%     \tn{hustvi}\oarg{通用选项}\marg{视觉标识}
+%     \cs{hustvi}\oarg{通用选项}\marg{视觉标识}
 %   \end{syntax}
-%   \tn{hustvi} 是本宏包提供给终端用户使用最重要的一个接口，
+%   \cs{hustvi} 是本宏包提供给终端用户使用最重要的一个接口，
 %   一切的视觉标识都是通过这个通用接口来使用。
 %   例如：
 %   \marginnote{\hustvi[height=1cm,temp=red]{emblem}}
@@ -156,7 +174,7 @@
 %   \item[\opt{width}] 视觉标识的宽度，默认值为 \opt{0pt}，即使用默认的宽度。如果仅设置了宽度而没有设置高度，则高度会自动按比例缩放；如果同时设置了宽度和高度，则宽高比会被强制为 \opt{width}:\opt{height}。
 %   \item[\opt{height}] 视觉标识的高度，默认值为 \opt{0pt}，效果同上。
 %   \item[\opt{temp}] 视觉标识的色彩预设模板，不同视觉标识的色彩预设模板不同，具体的色彩预设模板请参考对应视觉标识的文档。
-%   \item[\opt{colors}] 手动按照顺序覆写色彩预设模板，同时设置了 \opt{temp} 和 \opt{colors} 时，\opt{colors} 会覆盖 \opt{temp} 的设置。 \opt{colors} 的格式为有序列表 \opt{\{color1,color2,...\}}，其中 \opt{color1}、\opt{color2} 等为色彩名称，色彩名称需要由 \pkg{xcolor} 宏包定义的色彩名称，且列表中的色彩数量不能超过预设模板中的色彩数量。\marginnote{\hustvi[colors={hustblue,black},temp=red,height=1cm]{emblem}} 例如：|\hustvi[colors={hustblue,black},temp=red]{emblem}| 就是基于 \opt{red} 模板的校徽，对前两种颜色依序使用了华科蓝 \opt{hustblue} 和黑色 \opt{black} 两种色彩\footnote{本错误配色示例仅用于说明，实际使用时请遵循视觉标识的色彩规范。}。
+%   \item[\opt{colors}] 手动按照顺序覆写色彩预设模板，同时设置了 \opt{temp} 和 \opt{colors} 时，\opt{colors} 会覆盖 \opt{temp} 的设置。 \opt{colors} 的格式为有序列表 \opt{\{color1, color2, ...\}}，其中 \opt{color1}、\opt{color2} 等为色彩名称，色彩名称需要由 \pkg{xcolor} 宏包定义的色彩名称，且列表中的色彩数量不能超过预设模板中的色彩数量。\marginnote{\hustvi[colors={hustblue,black},temp=red,height=1cm]{emblem}} 例如：\cs{hustvi}\opt{\[colors=\{hustblue,black\},temp=red\]\{emblem\}} （如左页边所示）就是基于 \opt{red} 模板的校徽，对前两种颜色依序覆写了华科蓝 \opt{hustblue} 和黑色 \opt{black} 两种色彩\footnote{本错误配色示例仅用于说明，实际使用时请遵循视觉标识的色彩规范。}。
 %   \item[\opt{opacity}] （实验性功能）视觉标识的透明度，默认值为 \opt{1}，即不透明。透明度的范围为 \opt{0} 到 \opt{1}，其中 \opt{0} 表示完全透明，\opt{1} 表示完全不透明。
 %   \end{arguments}
 % \end{function}
@@ -175,11 +193,11 @@
 % \subsection{常量声明}
 %
 % \begin{macro}{\c_@@_univ_tl}
+% 定义校级视觉标识的“学院” \opt{dept} 名称。
 %    \begin{macrocode}
 \tl_const:Nn \c_@@_univ_tl { vi }
 %    \end{macrocode}
 % \end{macro}
-%
 %
 % \begin{macro}{\c_@@_depts_clist}
 % 定义了各个学院的缩写，使用官方网站域名四级子域名（域名 |.hust.edu.cn| 左边的部分）作为缩写。
@@ -241,7 +259,6 @@
 %   \l_@@_filename_tl,
 %   \l_@@_aliases_clist,
 %   \l_@@_colors_clist,
-%   \l_@@_temp_colors_clist,
 %   \l_@@_vi_tl,
 %   \l_@@_width_dim,
 %   \l_@@_height_dim,
@@ -257,7 +274,6 @@
 \tl_new:N \l_@@_filename_tl
 \clist_new:N \l_@@_aliases_clist
 \clist_new:N \l_@@_colors_clist
-\clist_new:N \l_@@_temp_colors_clist
 \tl_new:N \l_@@_vi_tl
 \dim_new:N \l_@@_width_dim
 \dim_new:N \l_@@_height_dim
@@ -413,6 +429,7 @@
 % \end{macro}
 %
 % \begin{macro}{\@@_prop_default_value:N}
+% 定义属性的默认值为第一个插入的值。
 %    \begin{macrocode}
 %\bool_new:N \l_@@_prop_set_bool
 \tl_new:N \l_@@_prop_set_tl
@@ -519,6 +536,7 @@
 % \subsubsection{图案定义}
 %
 % \begin{macro}{\@@_set_vi:n}
+% 定义视觉标识图案的函数。
 %    \begin{macrocode}
 \cs_new:Npn \@@_set_vi:n #1
   {
@@ -554,7 +572,7 @@
 % \end{macro}
 %
 % \begin{macro}{\@@_process_set_vi:}
-% 处理视觉标识文件的函数。
+% 处理在定义视觉标识图案时传入的参数。
 %    \begin{macrocode}
 \prop_new:N \l_@@_vi_prop
 \int_new:N \l_@@_ncolors_tmp_int
@@ -664,6 +682,7 @@
 % \subsection{用户接口}
 %
 % \begin{macro}{\hustvi}
+% 插入视觉标识图案的主函数。
 %    \begin{macrocode}
 \NewDocumentCommand \hustvi { O{} m }
   {
@@ -705,6 +724,7 @@
 % \end{macro}
 %
 % \begin{macro}{\@@_process_vi_name:}
+% 处理视觉标识唯一名称以及别名的函数。
 %    \begin{macrocode}
 \tl_new:N \l_@@_source_name_tl
 \cs_new:Npn \@@_process_vi_name:
@@ -733,6 +753,7 @@
 % \end{macro}
 %
 % \begin{macro}{\@@_process_temp:}
+% 处理视觉标识色彩预设模板的函数。
 %    \begin{macrocode}
 \bool_new:N \l_@@_prop_set_bool
 \cs_new:Npn \@@_process_temp:
@@ -768,6 +789,7 @@
 % \end{macro}
 %
 % \begin{macro}{\@@_process_colors:}
+% 处理视觉标识图案覆写色彩的函数。
 %    \begin{macrocode}
 \tl_new:N \l_@@_color_tl
 \cs_new:Npn \@@_process_colors:
@@ -782,7 +804,7 @@
 % \end{macro}
 %
 % \begin{macro}{\@@_process_file:}
-%   读取视觉标识文件（|hustvisual-*.def|），并将其内容前后添加 \TikZ 环境。
+% 读取视觉标识文件（|hustvisual-*.def|），并将其内容前后添加 \TikZ 环境。
 %    \begin{macrocode}
 \cs_new:Npn \@@_process_file:
   {
@@ -813,6 +835,7 @@
 % \end{macro}
 %
 % \begin{macro}{\@@_process_vi:}
+% 处理视觉标识图案尺寸的函数。
 %    \begin{macrocode}
 \box_new:N \l_@@_vi_box
 \cs_new:Npn \@@_process_vi:
