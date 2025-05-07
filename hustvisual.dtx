@@ -81,7 +81,7 @@
 %     但在实验性公开接口上存在不向后兼容的修改。
 %     一般对文档代码不作修改或者只需小幅修改就可以正常编译；
 %   \item |PATCH|：递增补丁版本号，
-%     表示新版本含有向后兼容的 bug 修复，新功能，
+%     表示新版本含有向后兼容的 bug 修复，新功能，或新的视觉标识，
 %     其中未文档化的私有接口可能会发生变化。
 % \end{itemize}
 % 以上内容所指的“公开接口”仅包括第 \ref{sec:usage} 节中介绍的供终端用户直接使用的接口。
@@ -91,17 +91,42 @@
 %
 % 本节介绍了宏包的开发和维护相关信息，
 % 包括如何添加新的色彩和图案。
+% 本节内容的指令仅可在本宏包或者子模块中使用，
+% 在正文文档中使用会导致编译错误。
 %
 % \begin{function}{\@@_set_color:nnn}
 %   \begin{syntax}
-%     \tn{@@_set_color:nnn}\marg{color-name}\marg{color-model}\marg{color-value}
+%     \tn{@@_set_color:nnn} \marg{色彩名称} \marg{色彩模型} \marg{色彩值}
 %   \end{syntax}
+%   \tn{@@_set_color:nnn} 是一个用于同时定义 \pkg{l3color} 和 \pkg{xcolor} 中的色彩的函数。例如：
+%   \begin{verbatim}
+%     \@@_set_color:nnn { hustblue } { CMYK } { 100, 74, 27, 0 }
+%   \end{verbatim}
+%   它包括三个必选参数：色彩名称、色彩模型和色彩值：
+%   \begin{arguments}
+%   \item[\marg{色彩名称}] 色彩名称，必须是一个合法的 \pkg{xcolor} 色彩名称。
+%   \item[\marg{色彩模型}] 色彩模型，支持的色彩模型包括 \opt{CMYK}、\opt{cmyk}、\opt{RGB}、\opt{rgb} 等。其中 \opt{CMYK} 是本宏包新增的色彩模型，支持 0--100 范围的 \opt{cmyk} 色彩。
+%   \item[\marg{色彩值}] 色彩值，支持由逗号分隔的色彩值，格式包括 \opt{CMYK}、\opt{cmyk}、\opt{RGB}、\opt{rgb} 等。
+% \end{arguments}
 % \end{function}
 %
 % \begin{function}{\@@_set_vi:n}
 %   \begin{syntax}
-%
+%     \tn{@@_set_vi:n} \marg{图案参数}
 %   \end{syntax}
+%   \tn{@@_set_vi:n} 是一个用于设置图案的函数。
+%   \marg{图案参数} 是一个由逗号分隔的键值对无序列表，
+%   其中每个键值对的格式为 \opt{key=value}。
+%   有些键值对是可选的，如果没有设置，则使用默认值；而有些是必选的，不设置则会导致编译错误。
+%   其中键值对的定义如下：
+%   \begin{arguments}
+%   \item[\opt{dept}] 视觉标识的所属学院，默认值为 \opt{vi}，即华中科技大学校级的视觉标识。学院的缩写使用官方网站域名四级子域名（域名 |.hust.edu.cn| 左边的部分）作为缩写。
+%   \item[\opt{vi}] 视觉标识的标识符，必选参数，是一个由逗号分隔的无序列表，宏包内部会自动将其排序后存储为唯一的视觉标识名称，与和 \opt{dept} 一起作为查找图案的默认文件名。
+%   \item[\opt{ncolors}] 视觉标识的色彩数量，默认值为 \opt{0}，即图案中没有可配置的色彩。
+%   \item[\opt{temps}] 视觉标识的色彩预设模板，如果 \opt{ncolors} 的值大于 \opt{0}，则该参数为必选参数。色彩预设模板的格式为有序列表 \opt{\{temp1=\{color1, color2, ...\}, temp2=\{color3, color1, ...\}, ...\}}。其中 \opt{temp1}、\opt{temp2} 等为色彩预设模板的名称，\opt{color1}、\opt{color2} 等为色彩名称，色彩名称需要由 \pkg{xcolor} 宏包定义的色彩名称，且列表中的色彩数量需要等同于 \opt{ncolors} 的值。其中第一个色彩预设模板会被用作默认的色彩预设模板。
+%   \item[\opt{filename}] 视觉标识的文件名，默认缺省，使用由 \opt{dept} 和 \opt{vi} 生成的文件名。如果 \opt{filename} 的值不为空，则该图案会被使用由 \opt{filename} 设置的文件名。
+%   \item[\opt{aliases}] 视觉标识的别名，默认为空，即没有别名。别名的格式为有序列表 \opt{\{\{vi1,vi2\},\{vi2,vi3,vi4\},...\}}，其中 \opt{vi1,vi2}、\opt{vi2,vi3,vi4} 等为别名，使用方式同 \opt{vi}，用于方便用户调用，不需要每次都输入完整的视觉标识名称。
+%   \end{arguments}
 % \end{function}
 %
 % \section{使用说明\label{sec:usage}}
@@ -118,8 +143,14 @@
 %     \hustvi[height=1cm,temp=red]{emblem}
 %   \end{verbatim}
 %   可以在文档中使用如左页边所示，以通用选项：高 \qty{1}{cm}、色彩预设为\opt{blue}的华中科技大学校徽。
-%   目前，所有的视觉标识都实现了如下的\oarg{通用选项}：
-%  \begin{arguments}
+%   其中，\marg{视觉标识}是一个由逗号分隔的无序列表，
+%   列表中的每一项都是一个视觉标识中的基础元素，
+%   这些元素的组合可以形成一个完整的视觉标识。
+%   如果视觉标识中只有一个基础元素，
+%   则可以省略逗号分隔符。
+%   而\oarg{通用选项}是由一系列逗号分隔的键值对无序列表组成的可选参数，
+%   所有的视觉标识都实现了如下的通用选项：
+%   \begin{arguments}
 %   \item[\opt{filename}] 视觉标识的文件名，默认缺省，通常情况下不需要设置，仅在需要覆盖原有文件时使用。
 %   \item[\opt{dept}] 视觉标识的所属学院，默认值为 \opt{vi}，即华中科技大学校级的视觉标识。学院的缩写使用官方网站域名四级子域名（域名 |.hust.edu.cn| 左边的部分）作为缩写。
 %   \item[\opt{width}] 视觉标识的宽度，默认值为 \opt{0pt}，即使用默认的宽度。如果仅设置了宽度而没有设置高度，则高度会自动按比例缩放；如果同时设置了宽度和高度，则宽高比会被强制为 \opt{width}:\opt{height}。
@@ -184,7 +215,7 @@
 %   \l_@@_color_arg_iv_tl,
 %   \l_@@_color_arg_v_tl,
 % }
-% 传入 Tikz 中的色彩参数，默认为黑色。
+% 传入 \TikZ 中的色彩参数，默认为黑色。
 %    \begin{macrocode}
 \clist_map_inline:Nn \c_@@_args_clist
   {
@@ -751,6 +782,7 @@
 % \end{macro}
 %
 % \begin{macro}{\@@_process_file:}
+%   读取视觉标识文件（|hustvisual-*.def|），并将其内容前后添加 \TikZ 环境。
 %    \begin{macrocode}
 \cs_new:Npn \@@_process_file:
   {
@@ -823,6 +855,18 @@
 %    \begin{macrocode}
 %<*doc-sty>
 %    \end{macrocode}
+%
+% 解决 |Package multicol Error: Error saving partial page.|
+% 方法来自于 \url{https://tex.stackexchange.com/a/95893}。
+%    \begin{macrocode}
+\setlength\IndexMin{100pt}
+%    \end{macrocode}
+%
+% \begin{macro}[no-user-doc]{\TikZ}
+%    \begin{macrocode}
+\newcommand\TikZ{Ti\emph{k}Z}
+%    \end{macrocode}
+% \end{macro}
 %
 % \begin{macro}[no-user-doc]{\key}
 % 用于在文档中输出自定义索引的命令，主要用于键值对的键的索引。仅当索引项的父分类为 |hustvi| 时，即用于文档类选项时，隐藏父分类。
