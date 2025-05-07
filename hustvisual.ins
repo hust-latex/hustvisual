@@ -30,7 +30,6 @@
 \generate
   {
 	\usedir{source/latex/hustvisual}
-	\file{\jobname.ins}{\from{\jobname.dtx}{install}}
   \file{\jobname-doc.sty}{\from{\jobname.dtx}{doc-sty}}
 	\usedir{tex/latex/hustvisual}
 	\file{\jobname.sty}{
@@ -39,9 +38,6 @@
 	}
 	\nopreamble\nopostamble
 	\file{\jobname-vi-emblem.def}{\from{\jobname-vi.dtx}{emblem}}
-	\file{\jobname-vi-emblem-revised.def}{\from{\jobname-vi.dtx}{emblem-revised}}
-	\file{\jobname-vi-logo.def}{\from{\jobname-vi.dtx}{logo}}
 	\file{\jobname-vi-horizontal-name-zh.def}{\from{\jobname-vi.dtx}{horizontal-name-zh}}
-	\file{\jobname-vi-name-vertical.def}{\from{\jobname-vi.dtx}{name-vertical}}
   }
 \endbatchfile

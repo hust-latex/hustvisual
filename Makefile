@@ -4,7 +4,9 @@
 
 PACKAGE := hustvisual
 EXT := sty
+DEF := def
 SOURCE := $(PACKAGE).dtx
+export TEXINPUTS := ./visuals:$(TEXINPUTS)
 
 TAG ?= $(shell git describe --tags --abbrev=0)
 
@@ -23,11 +25,11 @@ else
 	RRM := rm -r -f
 endif
 
-%.ins %.$(EXT): %.dtx
+%.$(EXT) %.$(DEF): %.ins
 	$(TEX) $<
 
-%.pdf: %.dtx %.$(EXT)
-	$(LATEX) $<
+%.pdf: %.dtx %.$(EXT) %.$(DEF)
+	$(LATEXMK) $<
 
 
 .DEFAULT_GOAL = build
@@ -73,15 +75,8 @@ ctan!: tag! build _ctan
 	$(GIT) restore $(SOURCE)
 ctan!!: tag!! build _ctan # FORCE TAGGING, WON'T restore source
 
-_user!!:
-	$(ZIP) $(PACKAGE)-user.zip $(PACKAGE).cls $(PACKAGE)-*.def \
-		$(PACKAGE).cbx $(PACKAGE).bbx hust-title.pdf
-	$(ZIP) $(PACKAGE)-user.zip --junk-paths demo/*.tex demo/*.bib
-user!: tag! build _user!! # generate user distribution
-user!!: tag!! build _user!! # FORCE TAGGING
-
-release!: tag! build ctan! user! # generate GitHub release
-release!!: tag!! build ctan!! user!! # FORCE TAGGING
+release!: tag! build ctan! # generate GitHub release
+release!!: tag!! build ctan!! # FORCE TAGGING
 
 
 clean:
@@ -89,7 +84,7 @@ clean:
 	$(RM) *.aux *.bbx *.bcf *.fdb_latexmk *.fls *.glo \
 		*.synctex.gz *.hd *.idx *.ind *.log *.out \
 		 *.toc *.xdv *.run.xml
-	$(RM) *.cls *.ins *.sty *.bib *.def *.cbx *.bbx *.zip
+	$(RM) *.sty *.def *.zip
 	$(RM) $(PACKAGE).pdf
 
 cleanall: clean uninstall
